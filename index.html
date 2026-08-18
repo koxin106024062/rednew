@@ -86,9 +86,40 @@
         <label class="field">地點<input name="location" placeholder="機場、車站或飯店"></label>
         <label class="field full">訂位代碼<input name="code" placeholder="只在需要時填寫"></label>
         <label class="field full">備註<textarea name="note" rows="3"></textarea></label>
-        <label class="field full">文件連結<input name="url" type="url" placeholder="Google Drive 或票券連結"></label>
+        <label class="field full">雲端檔案連結<input name="url" type="url" placeholder="Google Drive、iCloud 或票券連結"></label>
       </div>
       <footer class="dialog-actions split-actions"><button class="danger-link" type="button" data-delete-record="booking">刪除</button><button class="primary-btn" value="save">儲存</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="flight-dialog" class="sheet-dialog">
+    <form id="flight-form" method="dialog">
+      <header class="dialog-head">
+        <div><span class="eyebrow">FLIGHT DETAILS</span><h2>航班資訊</h2></div>
+        <button class="close-btn" type="button" data-close-dialog aria-label="關閉">×</button>
+      </header>
+      <div class="dialog-body form-grid">
+        <label class="field">出發日期<input name="outboundDate" type="date" required></label>
+        <label class="field">去程航班<input name="outboundFlight" placeholder="例如：中華航空 CI190"></label>
+        <label class="field">回程日期<input name="returnDate" type="date" required></label>
+        <label class="field">回程航班<input name="returnFlight" placeholder="例如：中華航空 CI189"></label>
+        <label class="field full">機票雲端連結<input name="ticketUrl" type="url" placeholder="Google Drive、iCloud 或航空公司電子機票連結"></label>
+      </div>
+      <footer class="dialog-actions"><button class="primary-btn" value="save">儲存航班資訊</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="passport-dialog" class="sheet-dialog small-dialog">
+    <form id="passport-form" method="dialog">
+      <header class="dialog-head">
+        <div><span class="eyebrow">TRAVEL DOCUMENT</span><h2>護照資料</h2></div>
+        <button class="close-btn" type="button" data-close-dialog aria-label="關閉">×</button>
+      </header>
+      <div class="dialog-body">
+        <p class="dialog-note">護照屬於敏感資料，請使用需要登入、且只開放給自己的雲端連結，不要設定為公開存取。</p>
+        <label class="field">護照雲端連結<input name="passportUrl" type="url" placeholder="Google Drive 或 iCloud 檔案連結"></label>
+      </div>
+      <footer class="dialog-actions"><button class="primary-btn" value="save">儲存護照連結</button></footer>
     </form>
   </dialog>
 
