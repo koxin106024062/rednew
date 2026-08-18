@@ -204,6 +204,7 @@ a { color: var(--wine-dark); }
 .trip-hero {
   position: relative;
   overflow: hidden;
+  
   border: 2px solid var(--ink);
   border-radius: 24px 20px 26px 19px;
   padding: 26px 22px 23px;
@@ -408,4 +409,27 @@ a { color: var(--wine-dark); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+}
+
+/* Reservation fields: one clean column and iOS-safe sizing. */
+#booking-form .dialog-body { grid-template-columns: minmax(0, 1fr); }
+#booking-form .field { grid-column: 1 / -1; width: 100%; }
+#booking-form .field input,
+#booking-form .field select,
+#booking-form .field textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+#booking-form .field input,
+#booking-form .field select { height: 48px; min-height: 48px; }
+#booking-form .field textarea { min-height: 96px; }
+#booking-form input[type="date"],
+#booking-form input[type="time"] {
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  -webkit-appearance: none;
+  appearance: none;
 }
