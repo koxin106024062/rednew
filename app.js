@@ -60,6 +60,23 @@ function esc(value) {
     .replace(/'/g, '&#039;');
 }
 
+function safeExternalUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  try {
+    const url = new URL(raw);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : '';
+  } catch (error) {
+    return '';
+  }
+}
+
+function externalLink(value, label) {
+  const url = safeExternalUrl(value);
+  if (!url) return '';
+  return '<a class="external-link" data-external-link href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '<span aria-hidden="true">↗</span></a>';
+}
+
 function dateAtNoon(iso) {
   return iso ? new Date(iso + 'T12:00:00') : null;
 }
@@ -485,7 +502,7 @@ function renderTimelineItem(item) {
     '<div class="timeline-item" data-action="edit-itinerary" data-id="' + esc(item.id) + '">',
       '<span class="timeline-time">' + esc(item.time || '彈性') + '</span>',
       '<span class="type-icon">' + typeIcon(item.type) + '</span>',
-      '<div class="timeline-body"><strong>' + esc(item.title) + '</strong><small>' + esc(meta || '尚無備註') + '</small></div>',
+      '<div class="timeline-body"><strong>' + esc(item.title) + '</strong><small>' + esc(meta || '尚無備註') + '</small>' + externalLink(item.mapUrl, '開啟地圖') + '</div>',
     '</div>'
   ].join('');
 }
@@ -506,7 +523,7 @@ function renderBookingCard(booking) {
   return [
     '<div class="booking-card" data-action="edit-booking" data-id="' + esc(booking.id) + '">',
       '<span class="booking-icon">' + typeIcon(booking.type) + '</span>',
-      '<div><div class="card-title">' + esc(booking.title) + '</div><div class="card-meta">' + esc(meta || '尚無詳細資料') + '</div></div>',
+      '<div><div class="card-title">' + esc(booking.title) + '</div><div class="card-meta">' + esc(meta || '尚無詳細資料') + '</div>' + externalLink(booking.url, '開啟文件') + '</div>',
       booking.code ? '<span class="booking-code">' + esc(booking.code) + '</span>' : '',
     '</div>'
   ].join('');
@@ -660,6 +677,7 @@ function renderListItem(trip, item) {
 }
 
 function handleClick(event) {
+  if (event.target.closest('[data-external-link]')) return;
   const close = event.target.closest('[data-close-dialog]');
   if (close) {
     const dialog = close.closest('dialog');
@@ -1310,6 +1328,7 @@ if (typeof module !== 'undefined' && module.exports) {
     expenseShares: expenseShares,
     calculateBalances: calculateBalances,
     calculateSettlements: calculateSettlements,
+    safeExternalUrl: safeExternalUrl,
     normalizeTrip: normalizeTrip,
     migrateLegacy: migrateLegacy
   };

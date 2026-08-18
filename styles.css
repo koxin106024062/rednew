@@ -241,6 +241,9 @@ a { color: var(--wine-dark); }
 .type-icon { display: grid; place-items: center; width: 27px; height: 27px; border: 1.5px solid var(--ink); border-radius: 50%; background: var(--caramel-soft); font-size: 13px; }
 .timeline-body strong { display: block; font-size: 14px; }
 .timeline-body small { display: block; margin-top: 3px; color: var(--ink-soft); line-height: 1.5; }
+.external-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 7px; padding: 4px 8px; border: 1.5px solid var(--wine); border-radius: 999px; background: rgba(169,31,36,.06); color: var(--wine-dark); font-size: 10px; font-weight: 900; line-height: 1.2; text-decoration: none; }
+.external-link:hover { background: var(--wine); color: #fff; }
+.external-link:focus-visible { outline: 3px solid rgba(189,99,43,.28); outline-offset: 2px; }
 .day-pills .chip-btn { background: var(--paper-light); color: var(--ink-soft); }
 .day-pills .chip-btn.active { background: var(--wine); color: #fff; }
 
