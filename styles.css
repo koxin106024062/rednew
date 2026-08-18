@@ -265,6 +265,22 @@ a { color: var(--wine-dark); }
 .money-card.accent { background: var(--sage-soft); }
 .money-card span { color: var(--ink-soft); font-size: 10px; }
 .money-card strong { display: block; margin-top: 4px; color: var(--wine-dark); font: 21px var(--display); }
+.flight-summary { display: grid; grid-template-columns: 1fr 58px 1fr; gap: 8px; align-items: center; padding: 14px; border: 1.5px solid var(--ink); border-radius: 16px 13px 18px 14px; background: var(--paper-light); }
+.flight-leg { min-width: 0; text-align: center; }
+.flight-leg > span { display: block; color: var(--wine-dark); font-size: 9px; font-weight: 900; letter-spacing: .12em; }
+.flight-leg strong { display: block; margin-top: 3px; font: 18px var(--display); }
+.flight-leg small { display: block; margin-top: 3px; overflow: hidden; color: var(--ink-soft); font-size: 10px; line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
+.flight-route { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px; color: var(--wine); }
+.flight-route span { font-size: 17px; transform: rotate(5deg); }
+.flight-route i { display: block; border-top: 1.5px dashed var(--wine); }
+.overview-link-row { min-height: 30px; margin-top: 9px; text-align: center; }
+.overview-link-row > span { color: var(--ink-faint); font-size: 10px; }
+.document-summary { display: grid; grid-template-columns: 38px 1fr auto; gap: 10px; align-items: center; padding: 13px; border: 1.5px solid var(--ink); border-radius: 15px 13px 17px 14px; background: var(--sage-soft); }
+.document-icon { display: grid; place-items: center; width: 37px; height: 37px; border: 1.5px solid var(--ink); border-radius: 11px 9px 12px 10px; background: var(--paper-light); color: var(--wine-dark); font-size: 18px; }
+.document-summary strong, .document-summary small { display: block; }
+.document-summary strong { font-size: 13px; }
+.document-summary small { margin-top: 3px; color: var(--ink-soft); font-size: 10px; }
+.document-summary .external-link { margin-top: 0; }
 .balance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 8px; }
 .balance-card { cursor: default; }
 .balance-card-head { display: flex; align-items: center; gap: 7px; }
@@ -386,6 +402,8 @@ a { color: var(--wine-dark); }
   .field.full, .full { grid-column: auto; }
   .countdown-stamp { width: 66px; height: 66px; }
   .hero-title { max-width: 72%; }
+  .document-summary { grid-template-columns: 38px 1fr; }
+  .document-summary .external-link { grid-column: 1 / -1; justify-self: start; }
 }
 
 @media (prefers-reduced-motion: reduce) {

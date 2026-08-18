@@ -183,6 +183,14 @@ function createDemoTrip() {
       { id: 'booking-1', type: 'flight', title: '台北 → 東京', date: '2027-04-24', time: '08:30', location: '桃園國際機場', code: '', note: '請於起飛前 2.5 小時抵達', url: '' },
       { id: 'booking-2', type: 'hotel', title: '東京住宿', date: '2027-04-24', time: '15:00', location: '淺草', code: '', note: '4 晚', url: '' }
     ],
+    flightInfo: {
+      outboundDate: '2027-04-24',
+      outboundFlight: '台北 → 東京',
+      returnDate: '2027-04-28',
+      returnFlight: '東京 → 台北',
+      ticketUrl: ''
+    },
+    passportUrl: '',
     expenses: [
       { id: 'expense-1', title: '機場到飯店交通', date: '2027-04-24', category: '交通', amount: 3600, currency: 'JPY', exchangeRate: 0.22, baseAmount: 792, payerId: members[0].id, participantIds: members.map(function (m) { return m.id; }), splitMode: 'equal', customSplits: {}, note: '', settled: false }
     ],
@@ -236,6 +244,8 @@ function normalizeTrip(trip) {
     members: [],
     itinerary: [],
     bookings: [],
+    flightInfo: null,
+    passportUrl: '',
     expenses: [],
     lists: [],
     documents: [],
@@ -243,6 +253,14 @@ function normalizeTrip(trip) {
   }, trip || {});
   if (!result.members.length) result.members = [makeMember('我', 0)];
   if (!result.sync) result.sync = { enabled: false, code: '' };
+  result.flightInfo = Object.assign({
+    outboundDate: result.startDate,
+    outboundFlight: '',
+    returnDate: result.endDate,
+    returnFlight: '',
+    ticketUrl: ''
+  }, result.flightInfo || {});
+  result.passportUrl = result.passportUrl || '';
   return result;
 }
 
@@ -442,7 +460,6 @@ function renderOverview(trip) {
     .filter(function (item) { return item.date >= today; })
     .sort(sortPlan)
     .slice(0, 3);
-  const todoCount = trip.lists.filter(function (item) { return item.type === 'todo' && !item.done; }).length;
   return [
     '<div class="trip-hero" style="--cover:' + esc(trip.coverColor) + '">',
       '<span class="brand-kicker">our next story</span>',
@@ -462,9 +479,35 @@ function renderOverview(trip) {
       nextItems.length ? '<div class="timeline-list">' + nextItems.map(renderTimelineItem).join('') + '</div>' : emptyInline('還沒有安排接下來的行程'),
     '</section>',
     '<section class="paper-section">',
-      '<div class="paper-section-head"><h2>出發準備</h2><button class="text-btn" data-action="go-tab" data-tab="more">管理清單 →</button></div>',
-      '<div class="money-card accent"><span>尚未完成的待辦</span><strong>' + todoCount + ' 件</strong></div>',
+      '<div class="paper-section-head"><h2>航班資訊</h2><button class="text-btn" data-action="edit-flight">編輯資料 →</button></div>',
+      renderFlightSummary(trip),
+    '</section>',
+    '<section class="paper-section">',
+      '<div class="paper-section-head"><h2>護照資料</h2><button class="text-btn" data-action="edit-passport">編輯連結 →</button></div>',
+      renderPassportSummary(trip),
     '</section>'
+  ].join('');
+}
+
+function renderFlightSummary(trip) {
+  const flight = trip.flightInfo || {};
+  return [
+    '<div class="flight-summary">',
+      '<div class="flight-leg"><span>去程</span><strong>' + esc(formatDate(flight.outboundDate, { month: 'numeric', day: 'numeric', weekday: 'short' })) + '</strong><small>' + esc(flight.outboundFlight || '尚未填寫航班') + '</small></div>',
+      '<div class="flight-route" aria-hidden="true"><span>✈</span><i></i></div>',
+      '<div class="flight-leg"><span>回程</span><strong>' + esc(formatDate(flight.returnDate, { month: 'numeric', day: 'numeric', weekday: 'short' })) + '</strong><small>' + esc(flight.returnFlight || '尚未填寫航班') + '</small></div>',
+    '</div>',
+    '<div class="overview-link-row">' + (externalLink(flight.ticketUrl, '開啟機票檔案') || '<span>尚未加入機票雲端連結</span>') + '</div>'
+  ].join('');
+}
+
+function renderPassportSummary(trip) {
+  return [
+    '<div class="document-summary">',
+      '<span class="document-icon" aria-hidden="true">▣</span>',
+      '<div><strong>個人護照檔案</strong><small>' + (safeExternalUrl(trip.passportUrl) ? '已加入受保護的雲端連結' : '尚未加入雲端連結') + '</small></div>',
+      externalLink(trip.passportUrl, '開啟護照檔案'),
+    '</div>'
   ].join('');
 }
 
@@ -523,7 +566,7 @@ function renderBookingCard(booking) {
   return [
     '<div class="booking-card" data-action="edit-booking" data-id="' + esc(booking.id) + '">',
       '<span class="booking-icon">' + typeIcon(booking.type) + '</span>',
-      '<div><div class="card-title">' + esc(booking.title) + '</div><div class="card-meta">' + esc(meta || '尚無詳細資料') + '</div>' + externalLink(booking.url, '開啟文件') + '</div>',
+      '<div><div class="card-title">' + esc(booking.title) + '</div><div class="card-meta">' + esc(meta || '尚無詳細資料') + '</div>' + externalLink(booking.url, '開啟雲端檔案') + '</div>',
       booking.code ? '<span class="booking-code">' + esc(booking.code) + '</span>' : '',
     '</div>'
   ].join('');
@@ -706,6 +749,8 @@ function handleClick(event) {
   if (action === 'edit-itinerary') return openItineraryDialog(target.dataset.id);
   if (action === 'add-booking') return openBookingDialog();
   if (action === 'edit-booking') return openBookingDialog(target.dataset.id);
+  if (action === 'edit-flight') return openFlightDialog();
+  if (action === 'edit-passport') return openPassportDialog();
   if (action === 'add-expense') return openExpenseDialog();
   if (action === 'edit-expense') return openExpenseDialog(target.dataset.id);
   if (action === 'toggle-expense-settled') return toggleExpenseSettled(target.dataset.id);
@@ -756,6 +801,8 @@ function bindForms() {
   document.getElementById('trip-form').addEventListener('submit', saveTripForm);
   document.getElementById('itinerary-form').addEventListener('submit', saveItineraryForm);
   document.getElementById('booking-form').addEventListener('submit', saveBookingForm);
+  document.getElementById('flight-form').addEventListener('submit', saveFlightForm);
+  document.getElementById('passport-form').addEventListener('submit', savePassportForm);
   document.getElementById('expense-form').addEventListener('submit', saveExpenseForm);
   document.getElementById('list-form').addEventListener('submit', saveListForm);
   document.getElementById('member-form').addEventListener('submit', saveMemberForm);
@@ -833,6 +880,14 @@ function saveTripForm(event) {
     members: memberList,
     itinerary: existing ? existing.itinerary : [],
     bookings: existing ? existing.bookings : [],
+    flightInfo: existing ? existing.flightInfo : {
+      outboundDate: values.startDate,
+      outboundFlight: '',
+      returnDate: values.endDate,
+      returnFlight: '',
+      ticketUrl: ''
+    },
+    passportUrl: existing ? existing.passportUrl : '',
     expenses: existing ? existing.expenses : [],
     lists: existing ? existing.lists : [],
     documents: existing ? existing.documents : [],
@@ -919,6 +974,59 @@ function saveBookingForm(event) {
   event.currentTarget.closest('dialog').close();
   render();
   showToast('預訂已儲存');
+}
+
+function openFlightDialog() {
+  const trip = currentTrip();
+  const form = document.getElementById('flight-form');
+  form.reset();
+  setFormValues(form, trip.flightInfo || {
+    outboundDate: trip.startDate,
+    outboundFlight: '',
+    returnDate: trip.endDate,
+    returnFlight: '',
+    ticketUrl: ''
+  });
+  showDialog('flight-dialog');
+}
+
+function saveFlightForm(event) {
+  event.preventDefault();
+  const trip = currentTrip();
+  const values = Object.fromEntries(new FormData(event.currentTarget).entries());
+  if (values.returnDate < values.outboundDate) return showToast('回程日期不能早於出發日期');
+  trip.flightInfo = {
+    outboundDate: values.outboundDate,
+    outboundFlight: values.outboundFlight.trim(),
+    returnDate: values.returnDate,
+    returnFlight: values.returnFlight.trim(),
+    ticketUrl: values.ticketUrl.trim()
+  };
+  updateTripTimestamp(trip);
+  saveState();
+  event.currentTarget.closest('dialog').close();
+  render();
+  showToast('航班資訊已儲存');
+}
+
+function openPassportDialog() {
+  const trip = currentTrip();
+  const form = document.getElementById('passport-form');
+  form.reset();
+  setFormValues(form, { passportUrl: trip.passportUrl || '' });
+  showDialog('passport-dialog');
+}
+
+function savePassportForm(event) {
+  event.preventDefault();
+  const trip = currentTrip();
+  const values = Object.fromEntries(new FormData(event.currentTarget).entries());
+  trip.passportUrl = values.passportUrl.trim();
+  updateTripTimestamp(trip);
+  saveState();
+  event.currentTarget.closest('dialog').close();
+  render();
+  showToast('護照連結已儲存');
 }
 
 function openExpenseDialog(id) {
